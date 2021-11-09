@@ -18,10 +18,10 @@ const app = express();
 
 // App Level MW
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(morgan('dev'));
 
-app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use(authRouter);
