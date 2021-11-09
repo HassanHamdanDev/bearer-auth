@@ -1,9 +1,9 @@
 'use strict';
 
-process.env.SECRET = "toes";
+process.env.SECRET = "guava";
 
 const supertest = require('supertest');
-const server = require('../../../src/server.js').server;
+const {server} = require('../../../src/server.js');
 const { db } = require('../../../src/auth/models/index.js');
 
 const mockRequest = supertest(server);
