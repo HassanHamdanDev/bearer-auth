@@ -14,15 +14,17 @@ let userInfo = {
 beforeAll(async (done) => {
   await db.sync();
   await user.create(userInfo.admin);
-  done();
+  // done();
 });
 afterAll(async (done) => {
   await db.drop();
-  done();
+  // done();
 });
 
 
-describe('Auth Middleware', () => {
+
+
+describe('user authentication', () => {
   // Mock the express req/res/next that we need for each middleware call
   const req = {};
   const res = {
@@ -30,30 +32,28 @@ describe('Auth Middleware', () => {
     send: jest.fn(() => res),
   };
   const next = jest.fn();
+  it('fails a login for a user (admin) with an incorrect token', () => {
+    req.headers = {
+      authorization: 'Bearer thisisabadtoken',
+    };
 
-  describe('user authentication', () => {
-    it('fails a login for a user (admin) with an incorrect token', () => {
-      req.headers = {
-        authorization: 'Bearer thisisabadtoken',
-      };
-
-      return middleware(req, res, next).then(() => {
-        expect(next).not.toHaveBeenCalled();
-        expect(res.status).toHaveBeenCalledWith(403);
-      });
+    return middleware(req, res, next).then(() => {
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(403);
     });
+  });
 
-    it('logs in a user with a proper token', () => {
-      const user = { username: 'admin' };
-      const token = jwt.sign(user, process.env.SECRET);
+  it('logs in a user with a proper token', () => {
+    const user = { username: 'admin' };
+    const token = jwt.sign(user, process.env.SECRET);
 
-      req.headers = {
-        authorization: `Bearer ${token}`,
-      };
+    req.headers = {
+      authorization: `Bearer ${token}`,
+    };
 
-      return middleware(req, res, next).then(() => {
-        expect(next).toHaveBeenCalledWith();
-      });
+    return middleware(req, res, next).then(() => {
+      expect(next).toHaveBeenCalledWith();
     });
   });
 });
+
