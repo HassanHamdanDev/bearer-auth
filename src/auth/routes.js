@@ -5,7 +5,7 @@ const authRouter = express.Router();
 
 const { users } = require('./models/index.js');
 const basicAuth = require('./middleware/basic.js')
-const bearerAuth = require('./middleware/bearer.js')
+const bearerAuth = require('./middleware/bearer.js');
 
 authRouter.post('/signup', async (req, res, next) => {
   try {
@@ -25,6 +25,15 @@ authRouter.post('/signin', basicAuth, (req, res, next) => {
     user: req.user,
     token: req.user.token
   };
+
+  // add cookieOptions
+  const cookieOptions = {
+    expire: new Date(Date.now + process.env.JWT_EXPIRE_COOKIE * 60 * 1000),
+    httpOnly: true
+  };
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  res.cookie('jwt', user.token, cookieOptions);
+
   res.status(200).json(user);
 });
 
